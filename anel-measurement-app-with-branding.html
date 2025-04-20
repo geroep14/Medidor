@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medidor de Tamanho de Aliança</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        
+        .store-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4A5D23; /* Verde musgo para combinar com os botões */
+            text-align: center;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .title {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .screen {
+            width: 100%;
+        }
+        
+        .calibration-screen, .measurement-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .measurement-screen {
+            display: none;
+        }
+        
+        .circle-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .circle {
+            position: absolute;
+            border: 2px solid #333;
+            border-radius: 50%;
+            background-color: transparent;
+        }
+        
+        .calibration-circle {
+            position: absolute;
+            border: 3px solid #e74c3c;
+            border-radius: 50%;
+            background-color: transparent;
+        }
+        
+        .circle-guide {
+            position: absolute;
+            border: 1px dashed #999;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background-color: #4A5D23; /* Verde musgo */
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .size-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .size-box {
+            padding: 10px 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .instruction {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            line-height: 1.5;
+        }
+        
+        .action-button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #4A5D23; /* Verde musgo */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .action-button:active {
+            transform: scale(0.98);
+        }
+        
+        .calibration-image {
+            width: 100%;
+            max-width: 200px;
+            margin: 15px 0;
+        }
+        
+        .whatsapp-button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #25D366; /* Cor do WhatsApp */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            margin-bottom: 30px;
+        }
+        
+        .whatsapp-button:active {
+            transform: scale(0.98);
+        }
+        
+        .whatsapp-button svg {
+            flex-shrink: 0;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            padding: 10px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho com Logo e Nome da Loja -->
+    <div class="header">
+        <img src="/api/placeholder/120/120" alt="Logo da Loja" class="logo" id="store-logo">
+        <div class="store-name" id="store-name">Sua Joalheria</div>
+    </div>
+    
+    <div class="container">
+        <h1 class="title">Medidor de Tamanho de Aliança</h1>
+        
+        <div class="screen calibration-screen" id="calibration-screen">
+            <div class="instruction">
+                <p>Calibração:</p>
+                <p>1. Para medições precisas, precisamos calibrar o app</p>
+                <p>2. Coloque uma moeda de 1 real sobre o círculo vermelho</p>
+                <p>3. Ajuste o tamanho do círculo para encaixar perfeitamente na moeda</p>
+                <p>4. Uma moeda de 1 real tem exatamente 27mm de diâmetro</p>
+            </div>
+            
+            <img src="/api/placeholder/200/200" alt="Moeda de 1 real" class="calibration-image">
+            
+            <div class="circle-container">
+                <div class="calibration-circle" id="calibration-circle"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="cal-decrease">-</button>
+                <div class="size-display">
+                    <div class="size-box" id="cal-size">27mm</div>
+                </div>
+                <button class="btn" id="cal-increase">+</button>
+            </div>
+            
+            <button class="action-button" id="complete-calibration">Concluir Calibração</button>
+        </div>
+        
+        <div class="screen measurement-screen" id="measurement-screen">
+            <div class="circle-container">
+                <div class="circle" id="circle"></div>
+                <div class="circle-guide" id="guide-15"></div>
+                <div class="circle-guide" id="guide-20"></div>
+                <div class="circle-guide" id="guide-25"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="decrease">-</button>
+                <div class="size-display">
+                    <div class="size-box" id="size-number">20</div>
+                    <div>Nº brasileiro</div>
+                </div>
+                <button class="btn" id="increase">+</button>
+            </div>
+            
+            <div class="instruction">
+                <p>Como usar:</p>
+                <p>1. Coloque sua aliança sobre o círculo</p>
+                <p>2. Ajuste o tamanho usando os botões + e -</p>
+                <p>3. Quando o círculo encaixar perfeitamente no interior da aliança, o número mostrado é o seu tamanho</p>
+            </div>
+            
+            <button class="action-button" id="recalibrate">Recalibrar</button>
+            
+            <a href="https://wa.me/558492182893" class="whatsapp-button" id="whatsapp-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                Escolher Modelo de Aliança
+            </a>
+        </div>
+    </div>
+    
+    <footer>
+        © 2025 - Todos os direitos reservados
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM - Cabeçalho
+            const storeLogo = document.getElementById('store-logo');
+            const storeName = document.getElementById('store-name');
+            
+            // Você pode personalizar o nome da loja aqui
+            storeName.textContent = "Sua Joalheria"; // Altere para o nome da sua loja
+            
+            // Para usar sua própria logo, você precisará substituir a URL do placeholder
+            // storeLogo.src = "caminho/para/sua/logo.png";
+            
+            // Elementos do DOM - Calibração
+            const calibrationScreen = document.getElementById('calibration-screen');
+            const calibrationCircle = document.getElementById('calibration-circle');
+            const calSizeDisplay = document.getElementById('cal-size');
+            const calDecreaseBtn = document.getElementById('cal-decrease');
+            const calIncreaseBtn = document.getElementById('cal-increase');
+            const completeCalibrationBtn = document.getElementById('complete-calibration');
+            
+            // Elementos do DOM - Medição
+            const measurementScreen = document.getElementById('measurement-screen');
+            const circle = document.getElementById('circle');
+            const sizeNumber = document.getElementById('size-number');
+            const decreaseBtn = document.getElementById('decrease');
+            const increaseBtn = document.getElementById('increase');
+            const recalibrateBtn = document.getElementById('recalibrate');
+            const whatsappBtn = document.getElementById('whatsapp-button');
+            
+            // Guias de referência
+            const guide15 = document.getElementById('guide-15');
+            const guide20 = document.getElementById('guide-20');
+            const guide25 = document.getElementById('guide-25');
+            
+            // Configurações iniciais
+            let currentSize = 20; // Tamanho inicial da aliança
+            let calibrationSize = 27; // Tamanho da moeda de 1 real em mm
+            let calibrationPixels = 200; // Tamanho inicial em pixels (será ajustado)
+            let pixelRatio = 1; // Relação entre pixels e mm
+            
+            // Função para atualizar o círculo de calibração
+            function updateCalibrationCircle() {
+                calibrationCircle.style.width = `${calibrationPixels}px`;
+                calibrationCircle.style.height = `${calibrationPixels}px`;
+                calSizeDisplay.textContent = `${calibrationSize}mm`;
+            }
+            
+            // Função para calcular a relação pixel/mm após calibração
+            function calculatePixelRatio() {
+                return calibrationPixels / calibrationSize;
+            }
+            
+            // Função para atualizar o tamanho do círculo de medição
+            function updateCircleSize() {
+                const diameterInMm = currentSize;
+                const diameterInPixels = diameterInMm * pixelRatio;
+                
+                circle.style.width = `${diameterInPixels}px`;
+                circle.style.height = `${diameterInPixels}px`;
+                sizeNumber.textContent = currentSize;
+                
+                // Atualizar link do WhatsApp com o tamanho atual
+                whatsappBtn.href = `https://wa.me/558492182893?text=Olá! Medi minha aliança e o tamanho é ${currentSize}. Gostaria de ver modelos disponíveis.`;
+            }
+            
+            // Função para atualizar os guias
+            function updateGuides() {
+                const sizes = [15, 20, 25];
+                const guides = [guide15, guide20, guide25];
+                
+                for (let i = 0; i < sizes.length; i++) {
+                    const diameterInMm = sizes[i];
+                    const diameterInPixels = diameterInMm * pixelRatio;
+                    
+                    guides[i].style.width = `${diameterInPixels}px`;
+                    guides[i].style.height = `${diameterInPixels}px`;
+                }
+            }
+            
+            // Eventos dos botões de calibração
+            calDecreaseBtn.addEventListener('click', function() {
+                calibrationPixels -= 5;
+                updateCalibrationCircle();
+            });
+            
+            calIncreaseBtn.addEventListener('click', function() {
+                calibrationPixels += 5;
+                updateCalibrationCircle();
+            });
+            
+            // Concluir calibração
+            completeCalibrationBtn.addEventListener('click', function() {
+                // Calcular a relação pixels/mm com base na calibração
+                pixelRatio = calculatePixelRatio();
+                
+                // Trocar para a tela de medição
+                calibrationScreen.style.display = 'none';
+                measurementScreen.style.display = 'flex';
+                
+                // Inicializar a tela de medição
+                updateCircleSize();
+                updateGuides();
+            });
+            
+            // Eventos dos botões de medição
+            decreaseBtn.addEventListener('click', function() {
+                if (currentSize > 10) {
+                    currentSize -= 0.5;
+                    updateCircleSize();
+                }
+            });
+            
+            increaseBtn.addEventListener('click', function() {
+                if (currentSize < 33) {
+                    currentSize += 0.5;
+                    updateCircleSize();
+                }
+            });
+            
+            // Botão para recalibrar
+            recalibrateBtn.addEventListener('click', function() {
+                calibrationScreen.style.display = 'flex';
+                measurementScreen.style.display = 'none';
+            });
+            
+            // Inicialização
+            updateCalibrationCircle();
+        });
+    </script>
+</body>
+</html>
